@@ -1,0 +1,849 @@
+<!DOCTYPE html>
+<html lang="id" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>E-Portfolio PPG - Magfira</title>
+    
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    
+    <!-- Google Fonts: Outfit (Modern & Clean) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Outfit', 'sans-serif'] },
+                    colors: {
+                        bgcolor: '#FFECC1',
+                        primary: '#F4A707',
+                        primaryHover: '#D18D00',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Outfit', sans-serif;
+            background-color: #FFECC1;
+            color: #1a1a1a;
+            margin: 0;
+            overflow-x: hidden;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #FFECC1; }
+        ::-webkit-scrollbar-thumb { background: #F4A707; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #D18D00; }
+
+        /* Page Transitions */
+        .page-view { 
+            display: none; 
+            opacity: 0; 
+            transform: translateX(20px); 
+            transition: opacity 0.4s ease, transform 0.4s ease; 
+        }
+        .page-view.active-page { 
+            display: block; 
+            opacity: 1; 
+            transform: translateX(0); 
+        }
+
+        /* Card Styles */
+        .custom-card {
+            background-color: #F4A707;
+            color: #1a1a1a;
+            border-radius: 20px;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            box-shadow: 0 4px 6px -1px rgba(0,0,0,0.1), 0 2px 4px -1px rgba(0,0,0,0.06);
+        }
+        .custom-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 15px -3px rgba(244, 167, 7, 0.4);
+        }
+
+        /* Navbar Styles */
+        .nav-link {
+            transition: all 0.3s ease;
+            border-radius: 12px;
+            font-weight: 600;
+        }
+        .nav-link.active, .nav-link:hover {
+            background-color: #FFECC1;
+            color: #1a1a1a;
+            transform: translateX(5px);
+        }
+
+        /* Tab Styles */
+        .tab-btn {
+            transition: all 0.3s ease;
+            border-radius: 10px;
+            font-weight: 600;
+            white-space: nowrap;
+        }
+        .tab-btn.active {
+            background-color: #1a1a1a;
+            color: #F4A707;
+        }
+
+        /* Images */
+        .img-container {
+            overflow: hidden;
+            border-radius: 12px;
+        }
+        .img-container img {
+            transition: transform 0.5s ease;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+        }
+        .img-container:hover img {
+            transform: scale(1.05);
+        }
+        
+        .no-scrollbar::-webkit-scrollbar { display: none; }
+        .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="antialiased selection:bg-[#1a1a1a] selection:text-[#F4A707] flex min-h-screen relative">
+
+    <!-- MOBILE HEADER -->
+    <div class="md:hidden fixed top-0 left-0 right-0 h-16 bg-[#F4A707] z-50 flex items-center justify-between px-6 shadow-md">
+        <span class="font-extrabold text-xl text-[#1a1a1a]">Portfolio.</span>
+        <button id="mobile-menu-btn" class="text-[#1a1a1a] p-2 rounded-lg hover:bg-black/10">
+            <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 6h16M4 12h16M4 18h16"></path></svg>
+        </button>
+    </div>
+
+    <!-- SIDEBAR (DESKTOP & MOBILE) -->
+    <aside id="sidebar" class="fixed top-0 left-0 h-full w-72 bg-[#F4A707] z-50 transform -translate-x-full md:translate-x-0 transition-transform duration-300 flex flex-col shadow-xl">
+        <div class="h-20 flex items-center justify-between px-8 border-b border-black/10 shrink-0">
+            <span class="font-extrabold text-2xl text-[#1a1a1a] tracking-tight">Magfira<span class="text-white">.</span></span>
+            <button id="close-menu-btn" class="md:hidden text-[#1a1a1a] p-2">
+                <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
+            </button>
+        </div>
+        
+        <nav class="flex-1 py-6 px-4 flex flex-col gap-2 overflow-y-auto no-scrollbar">
+            <button onclick="navigateTo('beranda')" id="nav-beranda" class="nav-link active flex items-center gap-4 px-5 py-3.5 text-[#1a1a1a]">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"></path></svg>
+                Beranda
+            </button>
+            <button onclick="navigateTo('profil')" id="nav-profil" class="nav-link flex items-center gap-4 px-5 py-3.5 text-[#1a1a1a]/80">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z"></path></svg>
+                Profil
+            </button>
+            <button onclick="navigateTo('praktik')" id="nav-praktik" class="nav-link flex items-center gap-4 px-5 py-3.5 text-[#1a1a1a]/80">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                Praktik Pembelajaran
+            </button>
+            <button onclick="navigateTo('non-mengajar')" id="nav-non-mengajar" class="nav-link flex items-center gap-4 px-5 py-3.5 text-[#1a1a1a]/80">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
+                Non-Mengajar
+            </button>
+            <button onclick="navigateTo('artefak')" id="nav-artefak" class="nav-link flex items-center gap-4 px-5 py-3.5 text-[#1a1a1a]/80">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z"></path></svg>
+                Artefak Dokumentasi
+            </button>
+            <button onclick="navigateTo('refleksi')" id="nav-refleksi" class="nav-link flex items-center gap-4 px-5 py-3.5 text-[#1a1a1a]/80">
+                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 01-2 2h-1a2 2 0 01-2-2v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path></svg>
+                Refleksi Diri
+            </button>
+        </nav>
+        
+        <div class="p-6 border-t border-black/10 text-center text-sm font-semibold text-[#1a1a1a]/60 shrink-0">
+            &copy; 2026 Magfira
+        </div>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="w-full md:ml-72 pt-24 md:pt-12 pb-24 md:pb-12 px-4 md:px-8 lg:px-12 transition-all duration-300 relative z-10">
+        
+        <!-- ================= BERANDA ================= -->
+        <section id="page-beranda" class="page-view active-page max-w-5xl mx-auto space-y-10">
+            <!-- Hero -->
+            <div class="flex flex-col lg:flex-row items-center justify-between gap-10">
+                <div class="flex-1 space-y-6">
+                    <span class="inline-block px-4 py-2 bg-[#F4A707] text-[#1a1a1a] font-bold rounded-full text-sm shadow-sm">E-Portfolio PPG Calon Guru</span>
+                    <h1 class="text-4xl lg:text-6xl font-extrabold text-[#1a1a1a] leading-tight tracking-tight">
+                        Halo, saya<br><span class="text-[#F4A707] drop-shadow-sm">Magfira</span>.
+                    </h1>
+                    <p class="text-base md:text-lg text-[#1a1a1a]/80 leading-relaxed max-w-lg">
+                        Dokumentasi komprehensif Praktik Pembelajaran Terbimbing, Praktik Mandiri Siklus 1 hingga Siklus 4, Analisis Perencanaan, Media, LKPD, Rubrik Asesmen, Rekap Nilai & Tugas Murid, serta Video Pembelajaran.
+                    </p>
+                    <div class="flex gap-4 pt-4">
+                        <button onclick="navigateTo('praktik')" class="px-8 py-3.5 bg-[#F4A707] text-[#1a1a1a] font-bold rounded-xl shadow-lg hover:bg-[#D18D00] transition-all transform hover:-translate-y-1">Mulai Penilaian</button>
+                        <button onclick="navigateTo('profil')" class="px-8 py-3.5 border-2 border-[#F4A707] text-[#1a1a1a] font-bold rounded-xl hover:bg-[#F4A707]/20 transition-all">Profil Pendidik</button>
+                    </div>
+                </div>
+                <div class="w-56 h-56 md:w-72 md:h-72 bg-[#F4A707] rounded-full flex items-center justify-center shadow-2xl relative shrink-0">
+                    <div class="absolute inset-2 border-4 border-dashed border-[#FFECC1] rounded-full animate-[spin_20s_linear_infinite] pointer-events-none"></div>
+                    <img src="Foto Beranda.jpeg" alt="Foto Magfira" class="w-full h-full object-cover rounded-full p-2 z-10" onerror="this.src='https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&q=80&w=600'">
+                </div>
+            </div>
+
+            <!-- Pengantar -->
+            <div class="custom-card p-8 md:p-10">
+                <h2 class="text-2xl font-bold mb-4 text-[#1a1a1a]">Pengantar</h2>
+                <div class="space-y-4 text-sm md:text-base text-[#1a1a1a]/90 leading-relaxed text-justify">
+                    <p>Selamat datang di E-Portfolio saya sebagai mahasiswa Pendidikan Profesi Guru (PPG). Website ini merupakan ruang dokumentasi sekaligus refleksi perjalanan saya dalam mengembangkan kompetensi sebagai calon guru profesional.</p>
+                    <p>Melalui e-portfolio ini, saya menyajikan berbagai pengalaman belajar, perangkat pembelajaran, serta praktik mengajar yang telah saya lakukan selama mengikuti Program PPL Mandiri. Setiap proses yang ditampilkan bukan hanya sebagai bukti kegiatan, tetapi juga sebagai sarana refleksi untuk terus memperbaiki kualitas pembelajaran yang saya rancang dan laksanakan.</p>
+                    <p>Harapannya, e-portfolio ini dapat memberikan gambaran nyata tentang kesiapan saya dalam menjadi pendidik yang tidak hanya kompeten, tetapi juga inspiratif dan adaptif terhadap perkembangan zaman.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PROFIL ================= -->
+        <section id="page-profil" class="page-view max-w-5xl mx-auto space-y-8">
+            <div class="mb-6">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-[#1a1a1a]">Profil <span class="text-[#F4A707]">Pendidik</span></h2>
+                <p class="text-[#1a1a1a]/70 mt-1 text-sm md:text-base">Informasi akademis, kompetensi pedagogis, dan nilai-nilai dasar pendidik profesional.</p>
+            </div>
+
+            <!-- Main Profile Card -->
+            <div class="custom-card p-6 md:p-10 flex flex-col md:flex-row gap-8 items-center">
+                <div class="w-full md:w-1/3 shrink-0 max-w-[260px]">
+                    <div class="aspect-[3/4] rounded-2xl overflow-hidden shadow-xl border-4 border-[#FFECC1]">
+                        <img src="Foto 2 Magfira.png" alt="Foto Profil" class="w-full h-full object-cover" onerror="this.src='https://images.unsplash.com/photo-1595152772835-219674b2a8a6?auto=format&fit=crop&q=80&w=600'">
+                    </div>
+                </div>
+                
+                <div class="flex-1 space-y-5">
+                    <h3 class="text-2xl font-bold text-[#1a1a1a]">Tentang Saya</h3>
+                    <p class="text-sm leading-relaxed text-justify opacity-90">Perkenalkan, saya Magfira, biasa dipanggil Fira. Saya lahir di Sinjai pada tanggal 12 Desember 2002 dan merupakan anak ke-2 dari 2 bersaudara. Saya merupakan alumni Program Studi Pendidikan Guru Sekolah Dasar di Universitas Negeri Makassar. Saat ini, saya sedang menempuh pendidikan Profesi Guru di Universitas Ahmad Dahlan pada Program Studi Pendidikan Guru Sekolah Dasar, sekaligus menjalani pendidikan di Universitas Negeri Yogyakarta dengan Program Studi Pendidikan Dasar. Saya memiliki minat yang tinggi dalam bidang pendidikan, khususnya dalam membina karakter peserta didik melalui pembelajaran yang bermakna dan menggembirakan.</p>
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-4">
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-0.5">Nama Lengkap</p>
+                            <p class="font-semibold text-sm">Magfira</p>
+                        </div>
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-0.5">NIM</p>
+                            <p class="font-semibold text-sm">2518563050</p>
+                        </div>
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-0.5">TTL</p>
+                            <p class="font-semibold text-sm">Sinjai, 12 Desember 2002</p>
+                        </div>
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-0.5">Kelas</p>
+                            <p class="font-semibold text-sm">PPG PGSD B</p>
+                        </div>
+                        <div class="bg-black/5 p-3 rounded-lg sm:col-span-2">
+                            <p class="text-[10px] font-bold uppercase tracking-wider text-[#1a1a1a]/60 mb-0.5">Alamat</p>
+                            <p class="font-semibold text-xs leading-relaxed">Ere Bulu, Desa Lembang Lohe, Kec. Tellu Limpoe, Kab. Sinjai, Prov. Sulawesi Selatan</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Riwayat Pendidikan -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="custom-card p-6 md:p-8">
+                    <h3 class="text-xl font-bold mb-4">Riwayat Pendidikan</h3>
+                    <div class="space-y-4 border-l-2 border-black/20 pl-4 ml-2">
+                        <div class="relative">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 bg-black rounded-full border-2 border-[#F4A707]"></div>
+                            <h4 class="font-bold text-sm">Universitas Ahmad Dahlan (2026-Sekarang)</h4>
+                            <p class="text-xs opacity-80 mt-0.5">PPG Calon Guru (Pendidikan Guru Sekolah Dasar)</p>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 bg-black/80 rounded-full border-2 border-[#F4A707]"></div>
+                            <h4 class="font-bold text-sm">Universitas Negeri Yogyakarta (2025-Sekarang)</h4>
+                            <p class="text-xs opacity-80 mt-0.5">Pendidikan Dasar S2</p>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 bg-black/60 rounded-full border-2 border-[#F4A707]"></div>
+                            <h4 class="font-bold text-sm">Universitas Negeri Makassar (2020-2024)</h4>
+                            <p class="text-xs opacity-80 mt-0.5">Pendidikan Guru Sekolah Dasar S1</p>
+                        </div>
+                        <div class="relative">
+                            <div class="absolute -left-[21px] top-1.5 w-3 h-3 bg-black/40 rounded-full border-2 border-[#F4A707]"></div>
+                            <h4 class="font-bold text-sm">SMA Negeri 9 Sinjai (2017-2020)</h4>
+                            <p class="text-xs opacity-80 mt-0.5">Ilmu Pengetahuan Alam</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="custom-card p-6 md:p-8">
+                    <h3 class="text-xl font-bold mb-4">Institusi & Lokasi PPL</h3>
+                    <div class="space-y-3">
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase opacity-60">Tempat PPG</p>
+                            <p class="font-bold text-sm">Universitas Ahmad Dahlan</p>
+                        </div>
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase opacity-60">Lokasi PPL</p>
+                            <p class="font-bold text-sm">SD Negeri Wirosaban</p>
+                        </div>
+                        <div class="bg-black/5 p-3 rounded-lg">
+                            <p class="text-[10px] font-bold uppercase opacity-60">Hobi</p>
+                            <p class="font-bold text-sm">Traveling & Membaca</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Inspirasi & Tujuan -->
+            <div class="grid md:grid-cols-2 gap-6">
+                <div class="custom-card p-6 md:p-8">
+                    <h3 class="text-lg font-bold mb-3">Inspirasi Menjadi Guru</h3>
+                    <p class="text-sm leading-relaxed text-justify opacity-90">Saat kelas 8 SMP, saya terlambat mengumpulkan tugas Bahasa Indonesia karena membantu orangtua di kebun, tetapi Bu Suhrah menanyakan alasan saya dengan tenang dan memberi tambahan waktu. Pengalaman itu membuat saya menyadari bahwa peserta didik belajar lebih baik ketika merasa aman untuk mencoba dan memperbaiki kesalahan, sehingga saya terinspirasi menghadirkan suasana serupa dalam pembelajaran saya.</p>
+                </div>
+                <div class="custom-card p-6 md:p-8">
+                    <h3 class="text-lg font-bold mb-3">Tujuan Menjadi Guru</h3>
+                    <p class="text-sm leading-relaxed text-justify opacity-90">Tujuan saya menjadi guru adalah membina peserta didik agar tumbuh menjadi pribadi yang jujur, bertanggung jawab, dan peduli terhadap sesama, serta mampu berpikir kritis dalam menyelesaikan masalah. Melalui media puzzle pada pembelajaran siklus hidup tumbuhan dan hewan, peserta didik berlatih menyusun urutan, menganalisis kesalahan, dan mencoba kembali tanpa takut salah, sekaligus belajar bekerja sama dan bertanggung jawab dalam kelompok.</p>
+                </div>
+            </div>
+
+            <!-- Pembelajaran PPL -->
+            <div class="custom-card p-6 md:p-8">
+                <h3 class="text-xl font-bold mb-4">Hal yang Saya Pelajari Selama PPL Mandiri</h3>
+                <div class="space-y-3 text-sm leading-relaxed text-justify opacity-90">
+                    <p>Selama melaksanakan PPL Mandiri, saya belajar bahwa mengajar bukan hanya menyampaikan materi, tetapi juga memahami kebutuhan dan karakteristik setiap murid. Saya belajar membuat apersepsi yang dekat dengan kehidupan sehari-hari agar murid lebih tertarik dan mudah memahami materi. Saya juga belajar menggunakan media pembelajaran yang menarik, seperti puzzle, kartu gambar, PPT, dan LKPD, supaya murid lebih aktif dalam belajar.</p>
+                    <p>Selain itu, saya menyadari bahwa setiap murid memiliki kemampuan yang berbeda, sehingga guru perlu memberikan bimbingan sesuai kebutuhan mereka. Saya juga belajar mengatur waktu pembelajaran, membagi tugas kelompok secara merata, serta memberikan kesempatan kepada semua murid untuk bertanya dan menyampaikan pendapat. Dari masukan Guru Pamong, saya memahami bahwa saya masih perlu memperbaiki pengelolaan waktu, memberikan pertanyaan pancingan kepada murid yang kesulitan, dan lebih sering memberikan apresiasi. Pengalaman ini membuat saya lebih memahami tanggung jawab seorang guru dan mendorong saya untuk terus belajar agar dapat menciptakan pembelajaran yang menyenangkan, efektif, dan sesuai dengan kebutuhan murid.</p>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= PRAKTIK PEMBELAJARAN ================= -->
+        <section id="page-praktik" class="page-view max-w-6xl mx-auto space-y-6">
+            <div class="mb-4">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-[#1a1a1a]">Praktik <span class="text-[#F4A707]">Pembelajaran</span></h2>
+                <p class="text-[#1a1a1a]/70 mt-1 text-sm md:text-base">Pilih tab siklus di bawah untuk melihat analisis lengkap serta mengunduh dokumen pendukung pembelajaran.</p>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex overflow-x-auto gap-2 bg-black/5 p-2 rounded-xl no-scrollbar">
+                <button onclick="switchCycleTab('terbimbing')" id="tab-terbimbing" class="tab-btn active flex-1 py-2.5 px-4 text-center text-sm">Terbimbing</button>
+                <button onclick="switchCycleTab('siklus1')" id="tab-siklus1" class="tab-btn flex-1 py-2.5 px-4 text-center text-sm hover:bg-black/5">Siklus 1</button>
+                <button onclick="switchCycleTab('siklus2')" id="tab-siklus2" class="tab-btn flex-1 py-2.5 px-4 text-center text-sm hover:bg-black/5">Siklus 2</button>
+                <button onclick="switchCycleTab('siklus3')" id="tab-siklus3" class="tab-btn flex-1 py-2.5 px-4 text-center text-sm hover:bg-black/5">Siklus 3</button>
+                <button onclick="switchCycleTab('siklus4')" id="tab-siklus4" class="tab-btn flex-1 py-2.5 px-4 text-center text-sm hover:bg-black/5">Siklus 4</button>
+            </div>
+
+            <!-- Content Container -->
+            <div id="cycle-content-container">
+                
+                <!-- ================= 1. PRAKTIK TERBIMBING ================= -->
+                <div id="content-terbimbing" class="cycle-content space-y-6">
+                    <div class="custom-card p-6 md:p-8">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full text-xs font-semibold mb-4">
+                            <span>Praktik Mengajar Terbimbing</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Mata Pelajaran</span>Matematika</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Kelas</span>V SD</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Materi</span>Kelipatan Bilangan (KPK & FPB)</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">A. Analisis Perencanaan</h4><p class="text-xs opacity-90 text-justify">Model PBL dipadukan Deep Learning (Mindful, Meaningful, Joyful) dan pendekatan TaRL. Diferensiasi kegiatan melalui Kode A, B, dan C sesuai kebutuhan belajar.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">B. Analisis Materi</h4><p class="text-xs opacity-90 text-justify">Konsep kelipatan bilangan melalui pola bilangan, penjumlahan berulang, dan hubungan dengan perkalian. Diperkuat melalui latihan dan masalah kontekstual (pola bunyi klakson).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">C. Analisis Media</h4><p class="text-xs opacity-90 text-justify">PPT, gambar, video, benda konkret, garis bilangan, LKPD, buku teks, laptop, dan proyektor.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">D. Analisis Video</h4><p class="text-xs opacity-90 text-justify">Pembelajaran interaktif. Murid antusias menghitung pola bilangan. Kendala: pengelolaan waktu dan pendampingan kelompok yang belum merata.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">E. Analisis Non-Mengajar</h4><p class="text-xs opacity-90 text-justify">Terlibat dalam 6 kegiatan non-mengajar (Piket 5S, TPA, Makan Sayur, dll).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">F. Instrumen Penilaian</h4><p class="text-xs opacity-90 text-justify">Asesmen diagnostik, observasi, penilaian LKPD dan presentasi, refleksi, serta evaluasi tertulis sesuai Kode A, B, C.</p></div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <h3 class="text-lg font-bold mb-4">Dokumen Pendukung</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Modul Ajar -->
+                            <button onclick="openDocModal('Modul Ajar Terbimbing', 'https://drive.google.com/file/d/1kAihxqWr-qP5uH8iNuwg6mWMIUo_XNQZ/view?usp=drive_link', 'https://drive.google.com/file/d/1kAihxqWr-qP5uH8iNuwg6mWMIUo_XNQZ/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Modul Ajar</button>
+                            <!-- Bahan Ajar -->
+                            <button onclick="openDocModal('Bahan Ajar Terbimbing', 'https://drive.google.com/file/d/1DPFxiRmPZyXB6T32PCmr-m9cakhN-RYi/view?usp=sharing', 'https://drive.google.com/file/d/1DPFxiRmPZyXB6T32PCmr-m9cakhN-RYi/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Bahan Ajar</button>
+                            <!-- LKPD -->
+                            <button onclick="openDocModal('LKPD Terbimbing', 'https://drive.google.com/file/d/1Nr5WHBerMHRhZSyPyd92SmJBjLS-8Td2/view?usp=sharing', 'https://drive.google.com/file/d/1Nr5WHBerMHRhZSyPyd92SmJBjLS-8Td2/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 LKPD</button>
+                            <!-- Refleksi -->
+                            <button onclick="openDocModal('Refleksi Terbimbing', 'LK4_Refleksi Praktek Mengajar Terbimbing PPLM Siklus 1_Magfira.pdf', 'LK4_Refleksi Praktek Mengajar Terbimbing PPLM Siklus 1_Magfira.pdf')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📝 Refleksi Terbimbing</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                            <h3 class="text-lg font-bold">Dokumentasi & Video</h3>
+                            <a href="https://youtu.be/FLBLBS8rpNk" target="_blank" class="px-4 py-2 bg-white/40 border border-black/10 hover:bg-white/60 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">▶ Buka Video</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="img-container aspect-video"><img src="Terbimbing 1.1.jpeg" alt="Terbimbing 1.1"></div>
+                            <div class="img-container aspect-video"><img src="Terbimbing 1.2.jpeg" alt="Terbimbing 1.2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 2. SIKLUS 1 ================= -->
+                <div id="content-siklus1" class="cycle-content space-y-6 hidden">
+                    <div class="custom-card p-6 md:p-8">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full text-xs font-semibold mb-4">
+                            <span>Praktik Mandiri - Siklus 1</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Mata Pelajaran</span>IPAS</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Kelas</span>III SD</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Materi</span>Siklus Hidup Hewan dan Tumbuhan</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">A. Analisis Perencanaan</h4><p class="text-xs opacity-90 text-justify">PBL dan Deep Learning (Mindful, Meaningful, Joyful). Pendekatan TaRL (Kode A Berkembang, B Cakap, C Mahir). Kegiatan: pemecahan masalah, puzzle, diskusi, LKPD, presentasi.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">B. Analisis Materi</h4><p class="text-xs opacity-90 text-justify">Siklus hidup katak dan tumbuhan tomat. Mengurutkan tahapan, mengenali perubahan bentuk, membandingkan, dan memahami pengaruh lingkungan.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">C. Analisis Media</h4><p class="text-xs opacity-90 text-justify">PPT, gambar, puzzle, kartu cerita, kartu pertanyaan berwarna, LKPD, bahan ajar, laptop, proyektor.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">D. Analisis Video</h4><p class="text-xs opacity-90 text-justify">Antusiasme tinggi saat menyusun puzzle. Kendala: pengaturan waktu padat, soal kartu kuning (HOTS) perlu bimbingan lebih, presentasi belum merata.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">E. Analisis Non-Mengajar</h4><p class="text-xs opacity-90 text-justify">Terlibat dalam 6 kegiatan non-mengajar (Piket 5S, TPA, Makan Sayur, dll).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">F. Instrumen Penilaian</h4><p class="text-xs opacity-90 text-justify">Asesmen awal, observasi, LKPD, presentasi, jurnal refleksi, tes tertulis. Nilai < 75 remedial, > 75 pengayaan.</p></div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <h3 class="text-lg font-bold mb-4">Dokumen Pendukung</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Modul Ajar -->
+                            <button onclick="openDocModal('Modul Ajar Siklus 1', 'https://drive.google.com/file/d/1xCGlhT49Fo34ZbOh84tRXf8e63UR1xpz/view?usp=drive_link', 'https://drive.google.com/file/d/1xCGlhT49Fo34ZbOh84tRXf8e63UR1xpz/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Modul Ajar</button>
+                            <!-- Bahan Ajar -->
+                            <button onclick="openDocModal('Bahan Ajar Siklus 1', 'https://drive.google.com/file/d/1RsZaU4Nl0HdHCLoZaBsodfo0Rvd0Ey4F/view?usp=sharing', 'https://drive.google.com/file/d/1RsZaU4Nl0HdHCLoZaBsodfo0Rvd0Ey4F/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Bahan Ajar</button>
+                            <!-- LKPD -->
+                            <button onclick="openDocModal('LKPD Siklus 1', 'https://drive.google.com/file/d/1azhYb5GRmC7UjjYW2ZC187cghB7eV9BE/view?usp=sharing', 'https://drive.google.com/file/d/1azhYb5GRmC7UjjYW2ZC187cghB7eV9BE/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 LKPD</button>
+                            <!-- Refleksi -->
+                            <button onclick="openDocModal('Refleksi Siklus 1', 'REFLEKSI SIKLUS 1_EMA HUMAERA.pdf', 'REFLEKSI SIKLUS 1_EMA HUMAERA.pdf')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📝 Refleksi Siklus 1</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                            <h3 class="text-lg font-bold">Dokumentasi & Video</h3>
+                            <a href="https://youtu.be/QnKXOU8yeY4" target="_blank" class="px-4 py-2 bg-white/40 border border-black/10 hover:bg-white/60 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">▶ Buka Video</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="img-container aspect-video"><img src="Siklus 1.1.jpeg" alt="Siklus 1.1"></div>
+                            <div class="img-container aspect-video"><img src="Siklus 1.2.jpeg" alt="Siklus 1.2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 3. SIKLUS 2 ================= -->
+                <div id="content-siklus2" class="cycle-content space-y-6 hidden">
+                    <div class="custom-card p-6 md:p-8">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full text-xs font-semibold mb-4">
+                            <span>Praktik Mandiri - Siklus 2</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Mata Pelajaran</span>Bahasa Indonesia</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Kelas</span>IV SD</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Materi</span>Perubahan Bentuk dan Fungsi Awalan Me-</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">A. Analisis Perencanaan</h4><p class="text-xs opacity-90 text-justify">PBL dan Deep Learning. Pendekatan TaRL. Kegiatan: pengamatan kata, diskusi, LKPD kartu kata & gunting-tempel, presentasi.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">B. Analisis Materi</h4><p class="text-xs opacity-90 text-justify">Perubahan bentuk dan fungsi awalan me- (contoh: pukul -> memukul, sapu -> menyapu).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">C. Analisis Media</h4><p class="text-xs opacity-90 text-justify">PPT, kartu kata, kartu gambar, LKPD gunting-tempel, bahan ajar, laptop, proyektor.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">D. Analisis Video</h4><p class="text-xs opacity-90 text-justify">Pembelajaran diawali dengan apersepsi menggunakan contoh kata sehari-hari. Murid terlihat antusias saat menerima LKPD dengan kemasan kreatif (kotak permen) berisi kartu kata bergambar. Saat kegiatan inti, murid aktif berdiskusi dan melakukan aktivitas gunting-tempel untuk mengelompokkan kata berdasarkan perubahan awalan me-. Saya berkeliling membimbing kelompok yang masih kesulitan, terutama pada kata yang huruf awalnya luluh. Kendala yang saya rasakan adalah pengelolaan waktu karena padatnya kegiatan diskusi dan presentasi.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">E. Analisis Non-Mengajar</h4><p class="text-xs opacity-90 text-justify">Terlibat dalam 6 kegiatan non-mengajar (Piket 5S, TPA, Makan Sayur, dll).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">F. Instrumen Penilaian</h4><p class="text-xs opacity-90 text-justify">Asesmen awal, observasi, LKPD, presentasi, refleksi, tes tertulis (PG, menjodohkan, isian, uraian).</p></div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <h3 class="text-lg font-bold mb-4">Dokumen Pendukung</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Modul Ajar & LKPD (Digabung) -->
+                            <button onclick="openDocModal('Modul Ajar & LKPD Siklus 2', 'https://drive.google.com/file/d/1Zbn_enNtN7BaqNzYzciRWKMg9CO3Zngs/view?usp=sharing', 'https://drive.google.com/file/d/1Zbn_enNtN7BaqNzYzciRWKMg9CO3Zngs/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Modul Ajar & LKPD</button>
+                            <!-- Bahan Ajar -->
+                            <button onclick="openDocModal('Bahan Ajar Siklus 2', 'https://drive.google.com/file/d/16PXJZzHOLmdZvuu5Ydg9A-ewNURjjNZG/view?usp=sharing', 'https://drive.google.com/file/d/16PXJZzHOLmdZvuu5Ydg9A-ewNURjjNZG/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Bahan Ajar</button>
+                            <!-- Refleksi -->
+                            <button onclick="openDocModal('Refleksi Siklus 2', 'REFLEKSI SIKLUS 2_EMA HUMAERA.pdf', 'REFLEKSI SIKLUS 2_EMA HUMAERA.pdf')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📝 Refleksi Siklus 2</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                            <h3 class="text-lg font-bold">Dokumentasi & Video</h3>
+                            <a href="https://youtu.be/pSf1sGGoJds" target="_blank" class="px-4 py-2 bg-white/40 border border-black/10 hover:bg-white/60 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">▶ Buka Video</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="img-container aspect-video"><img src="Siklus 2.1.jpeg" alt="Siklus 2.1"></div>
+                            <div class="img-container aspect-video"><img src="Siklus 2.2.jpeg" alt="Siklus 2.2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 4. SIKLUS 3 ================= -->
+                <div id="content-siklus3" class="cycle-content space-y-6 hidden">
+                    <div class="custom-card p-6 md:p-8">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full text-xs font-semibold mb-4">
+                            <span>Praktik Mandiri - Siklus 3</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Mata Pelajaran</span>Pendidikan Pancasila</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Kelas</span>V SD</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Materi</span>Sila-Sila Pancasila dan Nilai-Nilainya</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">A. Analisis Perencanaan</h4><p class="text-xs opacity-90 text-justify">PBL dan Deep Learning. TaRL. Kegiatan: pembahasan masalah sehari-hari (toleransi, perundungan, musyawarah), kerja kelompok, LKPD, presentasi.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">B. Analisis Materi</h4><p class="text-xs opacity-90 text-justify">Lambang dan bunyi sila Pancasila, makna nilai, penerapan di rumah, sekolah, masyarakat.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">C. Analisis Media</h4><p class="text-xs opacity-90 text-justify">PPT, poster lambang, kartu gambar, LKPD, bahan ajar, laptop, proyektor.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">D. Analisis Video</h4><p class="text-xs opacity-90 text-justify">Saya memulai pembelajaran dengan apersepsi yang mengaitkan materi pada pengalaman sehari-hari murid. Saat kegiatan inti, murid dibagi ke dalam kelompok untuk berdiskusi mengerjakan LKPD. Murid terlihat aktif menganalisis berbagai contoh perilaku dan mencocokkannya dengan nilai-nilai yang terkandung dalam sila Pancasila. Saya berkeliling memberikan pendampingan, terutama saat murid mulai tertukar antara lambang rantai dan pohon beringin. Namun, pada pengerjaan soal analisis (HOTS) di dalam LKPD, beberapa murid masih membutuhkan bimbingan dan pancingan intensif dari saya.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">E. Analisis Non-Mengajar</h4><p class="text-xs opacity-90 text-justify">Terlibat dalam 6 kegiatan non-mengajar (Piket 5S, TPA, Makan Sayur, dll).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">F. Instrumen Penilaian</h4><p class="text-xs opacity-90 text-justify">Asesmen awal, observasi, LKPD, presentasi, refleksi, tes tertulis (PG, isian, uraian berbasis kasus).</p></div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <h3 class="text-lg font-bold mb-4">Dokumen Pendukung</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Modul Ajar -->
+                            <button onclick="openDocModal('Modul Ajar Siklus 3', 'https://drive.google.com/file/d/13eX9dtrIZVQfAhbDXcEmfKtm8Mbcwbz9/view?usp=drive_link', 'https://drive.google.com/file/d/13eX9dtrIZVQfAhbDXcEmfKtm8Mbcwbz9/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Modul Ajar</button>
+                            <!-- Bahan Ajar -->
+                            <button onclick="openDocModal('Bahan Ajar Siklus 3', 'https://drive.google.com/file/d/1xC6NKy5HUHjCNbqpfXU6mjMX6uSX1q9_/view?usp=drive_link', 'https://drive.google.com/file/d/1xC6NKy5HUHjCNbqpfXU6mjMX6uSX1q9_/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Bahan Ajar</button>
+                            <!-- LKPD -->
+                            <button onclick="openDocModal('LKPD Siklus 3', 'https://drive.google.com/file/d/11rVUDOn-tfxyEjUTeYowpybj0u2eOMwG/view?usp=drive_link', 'https://drive.google.com/file/d/11rVUDOn-tfxyEjUTeYowpybj0u2eOMwG/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 LKPD</button>
+                            <!-- Refleksi -->
+                            <button onclick="openDocModal('Refleksi Siklus 3', 'Refleksi_Praktek_Mengajar_Mandiri_PPLM_Siklus3.pdf', 'Refleksi_Praktek_Mengajar_Mandiri_PPLM_Siklus3.pdf')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📝 Refleksi Siklus 3</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                            <h3 class="text-lg font-bold">Dokumentasi & Video</h3>
+                            <a href="https://youtu.be/cHhi6Ch8JGY" target="_blank" class="px-4 py-2 bg-white/40 border border-black/10 hover:bg-white/60 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">▶ Buka Video</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="img-container aspect-video"><img src="Siklus 3.1.jpeg" alt="Siklus 3.1"></div>
+                            <div class="img-container aspect-video"><img src="Siklus 3.2.jpeg" alt="Siklus 3.2"></div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- ================= 5. SIKLUS 4 ================= -->
+                <div id="content-siklus4" class="cycle-content space-y-6 hidden">
+                    <div class="custom-card p-6 md:p-8">
+                        <div class="inline-flex items-center gap-2 px-3 py-1 bg-black/10 rounded-full text-xs font-semibold mb-4">
+                            <span>Praktik Mandiri - Siklus 4</span>
+                        </div>
+                        <div class="grid grid-cols-1 sm:grid-cols-3 gap-3 text-sm">
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Mata Pelajaran</span>Seni Budaya (Seni Rupa)</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Kelas</span>III SD</div>
+                            <div class="bg-black/5 p-3 rounded-lg"><span class="block text-[10px] font-bold opacity-60 uppercase mb-1">Materi</span>Mengenal Unsur Seni Rupa (Titik, Garis, Bentuk)</div>
+                        </div>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">A. Analisis Perencanaan</h4><p class="text-xs opacity-90 text-justify">PBL dan Deep Learning. TaRL. Kegiatan: pengamatan gambar, permainan Garis Ajaib, diskusi, LKPD, presentasi.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">B. Analisis Materi</h4><p class="text-xs opacity-90 text-justify">Unsur seni rupa: titik, jenis garis, bentuk geometris. Memahami kesan garis (lengkung = lembut, zigzag = cepat).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">C. Analisis Media</h4><p class="text-xs opacity-90 text-justify">PPT, gambar unsur seni rupa, LKPD berjenjang, benda di sekitar kelas, laptop, proyektor, alat menggambar.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">D. Analisis Video</h4><p class="text-xs opacity-90 text-justify">Saya mengajak murid mengamati unsur seni rupa (titik, garis, dan bentuk) melalui benda-benda nyata yang ada di dalam kelas. Murid tampak bersemangat saat diminta menunjukkan contoh garis dan bentuk pada objek di sekitar mereka. Saat mengerjakan LKPD berjenjang secara berkelompok, murid aktif berdiskusi dan menuangkan kreativitasnya. Saya membimbing kelompok yang masih ragu. Tantangan yang saya temui adalah pada pengerjaan LKPD Level 3, di mana sebagian murid masih memerlukan penjelasan tambahan untuk membedakan jenis-jenis garis dan menganalisis kesan yang ditimbulkannya.</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">E. Analisis Non-Mengajar</h4><p class="text-xs opacity-90 text-justify">Terlibat dalam 6 kegiatan non-mengajar (Piket 5S, TPA, Makan Sayur, dll).</p></div>
+                        <div class="custom-card p-5"><h4 class="font-bold text-sm mb-2">F. Instrumen Penilaian</h4><p class="text-xs opacity-90 text-justify">Asesmen awal, observasi, LKPD kelompok, presentasi, refleksi, tes tertulis (PG, isian, benar/salah, uraian).</p></div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <h3 class="text-lg font-bold mb-4">Dokumen Pendukung</h3>
+                        <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                            <!-- Modul Ajar -->
+                            <button onclick="openDocModal('Modul Ajar Siklus 4', 'https://drive.google.com/file/d/1imOkEiqZNn8WsJE4OHjNT2SkuBYhcFWb/view?usp=drive_link', 'https://drive.google.com/file/d/1imOkEiqZNn8WsJE4OHjNT2SkuBYhcFWb/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Modul Ajar</button>
+                            <!-- Bahan Ajar -->
+                            <button onclick="openDocModal('Bahan Ajar Siklus 4', 'https://drive.google.com/file/d/1vOb_zWTwOx1aBBeqAjyiTW50oaB8zE4x/view?usp=drive_link', 'https://drive.google.com/file/d/1vOb_zWTwOx1aBBeqAjyiTW50oaB8zE4x/view?usp=drive_link')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 Bahan Ajar</button>
+                            <!-- LKPD -->
+                            <button onclick="openDocModal('LKPD Siklus 4', 'https://drive.google.com/file/d/1BtYB2fgOeVWWWWbCAEGlJUVDddm2TbGF/view?usp=sharing', 'https://drive.google.com/file/d/1BtYB2fgOeVWWWWbCAEGlJUVDddm2TbGF/view?usp=sharing')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📄 LKPD</button>
+                            <!-- Refleksi -->
+                            <button onclick="openDocModal('Refleksi Siklus 4', 'Refleksi_Praktek_Mengajar_Mandiri_PPLM_Siklus4.pdf', 'Refleksi_Praktek_Mengajar_Mandiri_PPLM_Siklus4.pdf')" class="bg-white/40 border border-black/10 hover:bg-white/60 py-3 rounded-xl font-bold text-xs transition-all">📝 Refleksi Siklus 4</button>
+                        </div>
+                    </div>
+
+                    <div class="custom-card p-6">
+                        <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center mb-4 gap-3">
+                            <h3 class="text-lg font-bold">Dokumentasi & Video</h3>
+                            <a href="https://youtu.be/CufwqvnS-sA" target="_blank" class="px-4 py-2 bg-white/40 border border-black/10 hover:bg-white/60 rounded-lg text-xs font-bold flex items-center gap-1.5 transition-colors">▶ Buka Video</a>
+                        </div>
+                        <div class="grid grid-cols-2 gap-2">
+                            <div class="img-container aspect-video"><img src="Siklus 4.1.jpeg" alt="Siklus 4.1"></div>
+                            <div class="img-container aspect-video"><img src="Siklus 4.2.jpeg" alt="Siklus 4.2"></div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        </section>
+
+        <!-- ================= NON-MENGAJAR ================= -->
+        <section id="page-non-mengajar" class="page-view max-w-5xl mx-auto space-y-6">
+            <div class="mb-4">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-[#1a1a1a]">Kegiatan <span class="text-[#F4A707]">Non-Mengajar</span></h2>
+                <p class="text-[#1a1a1a]/70 mt-1 text-sm md:text-base">Dokumentasi keterlibatan aktif dalam kultur persekolahan di SD Negeri Wirosaban.</p>
+            </div>
+            
+            <div class="grid md:grid-cols-2 gap-5">
+                <!-- Card 1 -->
+                <div class="custom-card p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <span class="px-3 py-1 bg-black/10 rounded-md text-xs font-bold uppercase tracking-wider mb-2 inline-block">Piket Sekolah</span>
+                        <h3 class="text-xl font-bold mt-1 mb-2">Piket 5S (Senyum, Sapa, Salam, Sopan, Santun)</h3>
+                        <p class="text-sm opacity-90 mb-4 text-justify">Menyambut peserta didik di gerbang sekolah setiap pagi (Senin, Rabu, Jumat), memeriksa kerapian seragam, dan menciptakan suasana positif.</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="img-container aspect-video"><img src="Piket 5S.jpeg" alt="Piket 5S"></div>
+                    </div>
+                </div>
+
+                <!-- Card 2 -->
+                <div class="custom-card p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <span class="px-3 py-1 bg-black/10 rounded-md text-xs font-bold uppercase tracking-wider mb-2 inline-block">Pendampingan Praktik</span>
+                        <h3 class="text-xl font-bold mt-1 mb-2">Pendampingan Makan Sayur Bersama</h3>
+                        <p class="text-sm opacity-90 mb-4 text-justify">Mendampingi murid saat makan sayur bersama setiap hari Kamis pagi untuk membiasakan pola makan sehat dan gizi seimbang.</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="img-container aspect-video"><img src="Pendampingan Makan Sayur Bersama.jpeg" alt="Pendampingan Makan Sayur Bersama"></div>
+                    </div>
+                </div>
+
+                <!-- Card 3 -->
+                <div class="custom-card p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <span class="px-3 py-1 bg-black/10 rounded-md text-xs font-bold uppercase tracking-wider mb-2 inline-block">Pendampingan Projek</span>
+                        <h3 class="text-xl font-bold mt-1 mb-2">Pendampingan TPA (Taman Pendidikan Al-Qur'an)</h3>
+                        <p class="text-sm opacity-90 mb-4 text-justify">Mendampingi murid membaca Al-Qur'an secara bergiliran setiap hari Rabu pagi dan membantu memperbaiki bacaan.</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="img-container aspect-video"><img src="Pendampingan TPA.jpeg" alt="Pendampingan TPA"></div>
+                    </div>
+                </div>
+
+                <!-- Card 4 -->
+                <div class="custom-card p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <span class="px-3 py-1 bg-black/10 rounded-md text-xs font-bold uppercase tracking-wider mb-2 inline-block">Pembinaan Kesiswaan</span>
+                        <h3 class="text-xl font-bold mt-1 mb-2">Pendampingan Salat Dhuha</h3>
+                        <p class="text-sm opacity-90 mb-4 text-justify">Mendampingi murid mengambil wudu, merapikan barisan, serta menjaga ketenangan dan ketertiban selama salat Dhuha (Jumat pagi).</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="img-container aspect-video"><img src="Pendampingan Salat Dhuha.jpeg" alt="Pendampingan Salat Dhuha"></div>
+                    </div>
+                </div>
+                
+                <!-- Card 5 -->
+                <div class="custom-card p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <span class="px-3 py-1 bg-black/10 rounded-md text-xs font-bold uppercase tracking-wider mb-2 inline-block">Kegiatan Sekolah</span>
+                        <h3 class="text-xl font-bold mt-1 mb-2">Pendampingan Pemeriksaan Kesehatan</h3>
+                        <p class="text-sm opacity-90 mb-4 text-justify">Membantu mengondisikan antrean pemeriksaan kesehatan (3 September 2026) agar berjalan tertib dan lancar.</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="img-container aspect-video"><img src="Pendampingan Pemeriksaan Kesehatan.jpeg" alt="Pendampingan Pemeriksaan Kesehatan"></div>
+                    </div>
+                </div>
+
+                <!-- Card 6 -->
+                <div class="custom-card p-6 flex flex-col justify-between h-full">
+                    <div>
+                        <span class="px-3 py-1 bg-black/10 rounded-md text-xs font-bold uppercase tracking-wider mb-2 inline-block">Kegiatan Sekolah</span>
+                        <h3 class="text-xl font-bold mt-1 mb-2">Pendampingan Jalan Santai</h3>
+                        <p class="text-sm opacity-90 mb-4 text-justify">Mendampingi murid dalam kegiatan jalan santai (21 Agustus 2026) untuk menjaga kebugaran dan keamanan.</p>
+                    </div>
+                    <div class="mt-2">
+                        <div class="img-container aspect-video"><img src="Pendampingan Jalan Santai.jpeg" alt="Pendampingan Jalan Santai"></div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= ARTEFAK ================= -->
+        <section id="page-artefak" class="page-view max-w-6xl mx-auto space-y-6">
+            <div class="mb-4">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-[#1a1a1a]">Artefak <span class="text-[#F4A707]">Dokumentasi</span></h2>
+                <p class="text-[#1a1a1a]/70 mt-1 text-sm md:text-base">Keseluruhan dokumentasi kegiatan selama menempuh PPL Mandiri di SD Negeri Wirosaban.</p>
+            </div>
+            
+            <div class="custom-card p-4 md:p-6">
+                <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-3">
+                    <!-- Praktik & Siklus -->
+                    <div class="img-container aspect-square"><img src="Terbimbing 1.1.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Terbimbing 1.2.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 1.1.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 1.2.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 2.1.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 2.2.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 3.1.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 3.2.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 4.1.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Siklus 4.2.jpeg" alt="Dok"></div>
+                    
+                    <!-- Non-Mengajar -->
+                    <div class="img-container aspect-square"><img src="Piket 5S.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Pendampingan Makan Sayur Bersama.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Pendampingan TPA.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Pendampingan Salat Dhuha.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Pendampingan Pemeriksaan Kesehatan.jpeg" alt="Dok"></div>
+                    <div class="img-container aspect-square"><img src="Pendampingan Jalan Santai.jpeg" alt="Dok"></div>
+                </div>
+            </div>
+        </section>
+
+        <!-- ================= REFLEKSI ================= -->
+        <section id="page-refleksi" class="page-view max-w-4xl mx-auto space-y-6">
+            <div class="mb-4">
+                <h2 class="text-3xl md:text-4xl font-extrabold text-[#1a1a1a]">Refleksi <span class="text-[#F4A707]">Diri</span></h2>
+                <p class="text-[#1a1a1a]/70 mt-1 text-sm md:text-base">Sintesis perjalanan PPL PPG Calon Guru serta Rencana Tindak Lanjut (RTL).</p>
+            </div>
+            
+            <div class="custom-card p-6 md:p-10 space-y-6">
+                <blockquote class="border-l-4 border-black/30 pl-5 py-1">
+                    <p class="text-base md:text-lg font-semibold italic text-[#1a1a1a]">"Menjadi guru profesional bukanlah titik akhir, melainkan sebuah komitmen pembelajaran sepanjang hayat. Setiap evaluasi di dalam kelas adalah pijakan untuk menghadirkan pembelajaran yang semakin bermakna bagi peserta didik."</p>
+                </blockquote>
+                
+                <div class="space-y-4 text-sm md:text-base text-[#1a1a1a]/90 leading-relaxed text-justify">
+                    <h3 class="text-lg font-bold mb-2">Sintesis Perjalanan PPL Mandiri (Terbimbing & Siklus 1-4)</h3>
+                    <p>Rangkaian Praktik Pembelajaran dari Terbimbing hingga Siklus 4 memberikan transformasi mendalam pada diri saya. Pada <strong class="font-bold">Praktik Terbimbing (Matematika)</strong>, saya belajar bahwa apersepsi konkret sangat membantu pemahaman murid, namun saya menyadari kelemahan dalam pengelolaan waktu dan pembagian perhatian antarkelompok.</p>
+                    <p>Di <strong class="font-bold">Siklus 1 (IPAS)</strong>, saya mulai menerapkan strategi Tutor Sebaya dan Diferensiasi (TaRL) secara lebih terstruktur. Media puzzle berhasil menarik minat, meski soal HOTS masih perlu bimbingan intensif.</p>
+                    <p><strong class="font-bold">Siklus 2 (B. Indonesia)</strong> mengajarkan saya pentingnya ice breaking dan media kreatif (kartu kata). Namun, saya masih perlu memperbaiki alokasi waktu agar presentasi dan refleksi tidak terburu-buru.</p>
+                    <p>Pada <strong class="font-bold">Siklus 3 (P. Pancasila)</strong>, saya belajar bahwa mengaitkan materi abstrak dengan pengalaman nyata murid sangat efektif. Saya menyadari perlunya menambah contoh nyata sebelum masuk ke soal HOTS.</p>
+                    <p>Puncaknya di <strong class="font-bold">Siklus 4 (Seni Rupa)</strong>, saya berhasil mengintegrasikan seluruh pembelajaran. Saya lebih peka terhadap murid yang pasif dan belajar bahwa pemanfaatan benda nyata di sekitar kelas sangat efektif untuk materi yang abstrak.</p>
+                </div>
+
+                <div class="grid sm:grid-cols-2 gap-4 pt-4 border-t border-black/10">
+                    <div class="bg-black/5 p-5 rounded-xl">
+                        <h4 class="font-bold text-sm mb-2 flex items-center gap-2"><span>✅</span> Pencapaian & Kekuatan</h4>
+                        <ul class="text-xs space-y-1.5 list-disc pl-4 opacity-90 text-justify">
+                            <li>Mampu merancang Modul Ajar berbasis PBL dan TaRL.</li>
+                            <li>Berhasil menciptakan pembelajaran variatif yang menyenangkan.</li>
+                            <li>Mampu mengelola kelas secara lebih tenang dan terstruktur.</li>
+                        </ul>
+                    </div>
+                    <div class="bg-black/5 p-5 rounded-xl">
+                        <h4 class="font-bold text-sm mb-2 flex items-center gap-2"><span>🚀</span> Rencana Tindak Lanjut (RTL)</h4>
+                        <ul class="text-xs space-y-1.5 list-disc pl-4 opacity-90 text-justify">
+                            <li>Membuat pembagian waktu yang lebih rinci di setiap tahap.</li>
+                            <li>Menyiapkan plan B dan media sebelum pembelajaran dimulai.</li>
+                            <li>Menerapkan pertanyaan berjenjang untuk memancing siswa pasif.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <!-- ================= MODALS ================= -->
+    
+    <!-- DOCUMENT VIEWER MODAL -->
+    <div id="doc-modal" class="fixed inset-0 z-[100] bg-[#1a1a1a]/70 backdrop-blur-sm hidden flex items-center justify-center p-3 md:p-4">
+        <div class="bg-[#FFECC1] rounded-2xl max-w-5xl w-full p-4 sm:p-6 shadow-2xl relative flex flex-col max-h-[90vh]">
+            <div class="flex justify-between items-center pb-3 border-b-2 border-[#F4A707]/30 mb-3 shrink-0">
+                <div class="pr-4">
+                    <h3 id="doc-modal-title" class="font-bold text-[#1a1a1a] text-sm md:text-base truncate">Pratinjau Dokumen</h3>
+                    <p id="doc-modal-filename" class="text-xs text-[#1a1a1a]/60 font-mono mt-0.5 truncate">filename.pdf</p>
+                </div>
+                <button onclick="closeDocModal()" class="w-8 h-8 rounded-full bg-[#F4A707] text-[#1a1a1a] flex items-center justify-center text-lg font-bold hover:bg-[#D18D00] shrink-0">&times;</button>
+            </div>
+            <div class="flex-grow w-full rounded-xl overflow-hidden bg-white/50 border border-black/10 relative">
+                <iframe id="doc-modal-iframe" src="" class="w-full h-full min-h-[50vh] border-0"></iframe>
+            </div>
+            <div class="flex flex-col sm:flex-row gap-2 justify-between items-center pt-3 shrink-0 mt-3 border-t-2 border-[#F4A707]/30">
+                <span class="text-[10px] md:text-xs font-medium text-[#1a1a1a]/60 hidden sm:block mr-auto">Gagal memuat? Buka di tab baru.</span>
+                <div class="flex gap-2 w-full sm:w-auto mt-2 sm:mt-0">
+                    <button onclick="closeDocModal()" class="flex-1 sm:flex-none px-5 py-2.5 bg-[#1a1a1a] text-[#FFECC1] hover:bg-[#1a1a1a]/80 rounded-lg text-xs md:text-sm font-bold transition-all">Tutup</button>
+                    <a id="doc-modal-download" href="#" target="_blank" class="flex-1 sm:flex-none px-5 py-2.5 bg-[#F4A707] hover:bg-[#D18D00] text-[#1a1a1a] rounded-lg text-xs md:text-sm font-bold shadow-sm transition-all text-center flex items-center justify-center">Buka Tab Baru ↗</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const pages = ['beranda', 'profil', 'praktik', 'non-mengajar', 'artefak', 'refleksi'];
+
+        function navigateTo(pageId) {
+            if (!pages.includes(pageId)) pageId = 'beranda';
+            
+            pages.forEach(id => {
+                const pageEl = document.getElementById(`page-${id}`);
+                const navBtn = document.getElementById(`nav-${id}`);
+                if (pageEl) pageEl.classList.remove('active-page');
+                if (navBtn) navBtn.classList.remove('active');
+            });
+            
+            const targetPage = document.getElementById(`page-${pageId}`);
+            const targetNavBtn = document.getElementById(`nav-${pageId}`);
+            
+            if (targetPage) targetPage.classList.add('active-page');
+            if (targetNavBtn) targetNavBtn.classList.add('active');
+            
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+            window.location.hash = pageId;
+        }
+
+        document.getElementById('mobile-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.remove('-translate-x-full');
+        });
+        
+        document.getElementById('close-menu-btn').addEventListener('click', () => {
+            document.getElementById('sidebar').classList.add('-translate-x-full');
+        });
+
+        const cycles = ['terbimbing', 'siklus1', 'siklus2', 'siklus3', 'siklus4'];
+        function switchCycleTab(cycleId) {
+            cycles.forEach(id => {
+                const content = document.getElementById(`content-${id}`);
+                const tabBtn = document.getElementById(`tab-${id}`);
+                if (content) content.classList.add('hidden');
+                if (tabBtn) {
+                    tabBtn.classList.remove('active');
+                    tabBtn.classList.add('hover:bg-black/5');
+                }
+            });
+            
+            const targetContent = document.getElementById(`content-${cycleId}`);
+            const targetTabBtn = document.getElementById(`tab-${cycleId}`);
+            
+            if (targetContent) targetContent.classList.remove('hidden');
+            if (targetTabBtn) {
+                targetTabBtn.classList.add('active');
+                targetTabBtn.classList.remove('hover:bg-black/5');
+            }
+        }
+
+        // Fungsi OpenDocModal Otomatis Mengubah link Drive agar Bisa di Embed (Pratinjau)
+        function openDocModal(title, originalUrl, downloadUrl) {
+            // Ubah link 'view?usp=...' menjadi 'preview' agar bisa tampil di iframe
+            let embedUrl = originalUrl;
+            if (originalUrl.includes('drive.google.com')) {
+                embedUrl = originalUrl.replace('/view?usp=sharing', '/preview').replace('/view?usp=drive_link', '/preview');
+            }
+
+            document.getElementById('doc-modal-title').innerText = title;
+            document.getElementById('doc-modal-filename').innerText = originalUrl.split('/').pop().split('?')[0] || 'Dokumen';
+            document.getElementById('doc-modal-iframe').src = embedUrl;
+            document.getElementById('doc-modal-download').href = downloadUrl;
+            
+            document.getElementById('doc-modal').classList.remove('hidden');
+            document.getElementById('doc-modal').classList.add('flex');
+        }
+        
+        function closeDocModal() { 
+            document.getElementById('doc-modal').classList.add('hidden'); 
+            document.getElementById('doc-modal').classList.remove('flex');
+            document.getElementById('doc-modal-iframe').src = ''; 
+        }
+
+        window.addEventListener('load', () => {
+            const initialHash = window.location.hash.replace('#', '');
+            if (initialHash && pages.includes(initialHash)) { 
+                navigateTo(initialHash); 
+            } else { 
+                navigateTo('beranda'); 
+            }
+        });
+
+        window.addEventListener('hashchange', () => {
+            const currentHash = window.location.hash.replace('#', '');
+            if (currentHash && pages.includes(currentHash)) { navigateTo(currentHash); }
+        });
+    </script>
+</body>
+</html>
